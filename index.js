@@ -5,12 +5,22 @@ const sqlite = require('sqlite'),
       app = express();
 
 const sequelize = new Sequelize({
+  host: 'localhost',
   database: null,
   username: null,
   password: null,
   dialect: 'sqlite',
   storage: './db/database.db'
 });
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('Connection has been established successfully.');
+  })
+  .catch(err => {
+    console.error('Unable to connect to the database:', err);
+  });
 
 const { PORT=3000, NODE_ENV='development', DB_PATH='./db/database.db' } = process.env;
 
@@ -30,14 +40,26 @@ const Film = sequelize.define('film', {
   original_language: Sequelize.STRING,
   status: Sequelize.STRING,
   genre_id: Sequelize.INTEGER
+},{
+  timestamps: false
+});
+
+const Genre = sequelize.define('genre', {
+  name: Sequelize.STRING
+}, {
+  timestamps: false
 })
+
+Genre.belongsTo(Film);
+
 sequelize.sync()
   .then(() => {
     console.log('hello');
   });
-// Films.findAll().then(films => {
-//   console.log(films);
-// })
+Film.findAll().then(films => {
+  console.log(films);
+})
+
 // ROUTES
 app.get('/films/:id/recommendations', getFilmRecommendations);
 
