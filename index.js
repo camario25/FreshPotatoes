@@ -41,7 +41,8 @@ const Film = sequelize.define('film', {
   status: Sequelize.STRING,
   genre_id: Sequelize.INTEGER
 },{
-  timestamps: false
+  timestamps: false,
+  underscored: true
 });
 
 const Genre = sequelize.define('genre', {
@@ -50,14 +51,14 @@ const Genre = sequelize.define('genre', {
   timestamps: false
 })
 
-Genre.belongsTo(Film);
+Film.belongsTo(Genre);
 
 sequelize.sync()
   .then(() => {
     console.log('hello');
   });
-Film.findAll().then(films => {
-  console.log(films);
+Film.findOne({ include: [Genre] }).then(film => {
+  console.log(JSON.stringify(film.dataValues));
 })
 
 // ROUTES
