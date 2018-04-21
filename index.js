@@ -3,6 +3,7 @@ const sqlite = require('sqlite'),
       request = require('request'),
       express = require('express'),
       app = express();
+      Op = Sequelize.Op;
 
 const sequelize = new Sequelize({
   host: 'localhost',
@@ -48,25 +49,30 @@ const Film = sequelize.define('film', {
 const Genre = sequelize.define('genre', {
   name: Sequelize.STRING
 }, {
-  timestamps: false
+  timestamps: false,
+  underscored: true
 })
 
 Film.belongsTo(Genre);
 
-sequelize.sync()
-  .then(() => {
-    console.log('hello');
-  });
-Film.findOne({ include: [Genre] }).then(film => {
-  console.log(JSON.stringify(film.dataValues));
-})
+sequelize.sync();
+
 
 // ROUTES
 app.get('/films/:id/recommendations', getFilmRecommendations);
 
 // ROUTE HANDLER
 function getFilmRecommendations(req, res) {
-  res.status(500).send('Not Implemented');
+  console.log(req.params.id);
+  Film.findById(req.params.id).then(film => {
+    res.status(200).send(film)
+  })
+  // Film.findOne({
+  //   where: {id: req.params.id }}{ include: [Genre]}).then(film => {
+  //   res.status(200).send(req.params.id);
+  //   console.log(JSON.stringify(film.dataValues.genre.name));
+  // })
+  // 
 }
 
 module.exports = app;
