@@ -1,9 +1,9 @@
 const sqlite = require('sqlite'),
       Sequelize = require('sequelize'),
+      Op = Sequelize.Op,
       request = require('request'),
       express = require('express'),
       app = express(),
-      Op = Sequelize.Op,
       moment = require('moment')
 
 const sequelize = new Sequelize({
@@ -76,21 +76,23 @@ function getFilmRecommendations(req, res) {
   }
 
   Film.findById(orgId).then(film => {
+    let relDate = moment(film.release_date);
     let before15 = moment(film.dataValues.release_date).subtract(15,'years').format('YYYY-MM-DD');
     let after15 = moment(film.release_date).add(15, 'years').format('YYYY-MM-DD');
+    console.log(relDate);
+    console.log(before15);
+    console.log(after15);
     Film.findAll({
-      where: {
-        // [Op.and]: {
-        genre_id: film.genre_id
-        // release_date: {
-        //   [Op.gte]: before15,
-        //   [Op.lte]: after15
-        //   }
-        // }
-      }
+      where: [ {
+        genre_id: film.genre_id,
+        release_date: {
+          $between: [before15, after15]
+        }
+      }],
+      order: ['id']
     }).then(films => {
-      console.log(films[0].dataValues.title);
-      res.status(200).send(films[0].dataValues.title);
+      console.log(films);
+      res.status(200).send(films);
     })
 
   });
