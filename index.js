@@ -76,13 +76,23 @@ function getFilmRecommendations(req, res) {
   }
 
   Film.findById(orgId).then(film => {
-    let before15 = moment(film.dataValues.release_date).format('YYYY-MM-DD');
-    let after15 = moment(film.release_date).format('YYYY-MM-DD');
-    console.log(film.dataValues.release_date);
-    console.log(film.release_date);
-    console.log(before15);
-    console.log(after15);
-    res.status(200).send(film)
+    let before15 = moment(film.dataValues.release_date).subtract(15,'years').format('YYYY-MM-DD');
+    let after15 = moment(film.release_date).add(15, 'years').format('YYYY-MM-DD');
+    Film.findAll({
+      where: {
+        // [Op.and]: {
+        genre_id: film.genre_id
+        // release_date: {
+        //   [Op.gte]: before15,
+        //   [Op.lte]: after15
+        //   }
+        // }
+      }
+    }).then(films => {
+      console.log(films[0].dataValues.title);
+      res.status(200).send(films[0].dataValues.title);
+    })
+
   });
 
   // Film.findOne({
