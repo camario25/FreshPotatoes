@@ -90,21 +90,18 @@ function getFilmRecommendations(req, res) {
       order: ['id']
     }).then(films => {
       let filmIds = films.map(film => {
-        console.log(film.id);
         return film.id
       });
-      console.log(filmIds);
-      let idString = filmIds.join(',');
-      res.status(200).send(idString);
-    })
-  });
 
-  // Film.findOne({
-  //   where: {id: req.params.id }}{ include: [Genre]}).then(film => {
-  //   res.status(200).send(req.params.id);
-  //   console.log(JSON.stringify(film.dataValues.genre.name));
-  // })
-  // 
+      let idString = filmIds.join(',');
+      request(`http://credentials-api.generalassemb.ly/4576f55f-c427-4cfc-a11c-5bfe914ca6c1?films=${idString}`, (err, response, body) =>{
+        console.log(body);
+           res.status(200).send(body);
+      })
+    })
+    
+  });
+   // res.status(200).send(idString);
 }
 
 module.exports = app;
