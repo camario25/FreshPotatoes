@@ -2,8 +2,9 @@ const sqlite = require('sqlite'),
       Sequelize = require('sequelize'),
       request = require('request'),
       express = require('express'),
-      app = express();
-      Op = Sequelize.Op;
+      app = express(),
+      Op = Sequelize.Op,
+      moment = require('moment')
 
 const sequelize = new Sequelize({
   host: 'localhost',
@@ -63,9 +64,28 @@ app.get('/films/:id/recommendations', getFilmRecommendations);
 
 // ROUTE HANDLER
 function getFilmRecommendations(req, res) {
-  console.log(req.params.id);
-  Film.findById(req.params.id).then(film => {
-    res.status(200).send(film)
+  let limit = 7;
+  let offset = 0;
+  let orgId = parseInt(req.params.id);
+  
+  if(req.query.limit) {
+    limit = parseInt(req.query.limit);
+  }
+  if(req.query.offset) {
+    offset = parseInt(req.query.limit);
+  }
+
+
+  Film.findAll({ 
+    where: {
+    id: orgId
+  },
+    include: [Genre]}).then(film => {
+      console.log(film);
+      let before15 = moment(film.dataValues.release_date).format('YYYY-MM-DD');
+      let after15 = moment(film.release_date).format('YYYY-MM-DD');
+      console.log(before15);
+      res.status(200).send(film)
   })
   // Film.findOne({
   //   where: {id: req.params.id }}{ include: [Genre]}).then(film => {
