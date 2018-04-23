@@ -65,10 +65,11 @@ app.get('/films/:id/recommendations', getFilmRecommendations);
 //GET AVERAGE
 function getAverageRating(reviewArr) {
   let sum = 0;
+  // console.log(reviewArr[0]);
   reviewArr.forEach( review => {
     sum += review.rating;
-    return sum / reviewArr.lenght;
   })
+  return sum / reviewArr.length;
 }
 
 // ROUTE HANDLER
@@ -107,10 +108,10 @@ function getFilmRecommendations(req, res) {
       
       request(`http://credentials-api.generalassemb.ly/4576f55f-c427-4cfc-a11c-5bfe914ca6c1?films=${idString}`, (err, response, body) =>{
         // console.log(response);
-        filmIdReviews = JSON.parse(body);
+        filmIdReviews = JSON.parse(response.body);
         filmIdReviews.forEach(filmRevs => {
-          if(filmRevs.reviews.length >= 5) {
-            console.log(filmIdReviews);
+          if(filmRevs.reviews.length >=5 && (getAverageRating(filmRevs.reviews) >= 4)) {
+            console.log(getAverageRating(filmRevs.reviews));
           }
         })
       })
