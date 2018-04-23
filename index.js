@@ -107,11 +107,12 @@ function getFilmRecommendations(req, res) {
       let filteredArray = [];
       
       request(`http://credentials-api.generalassemb.ly/4576f55f-c427-4cfc-a11c-5bfe914ca6c1?films=${idString}`, (err, response, body) =>{
-        // console.log(response);
         filmIdReviews = JSON.parse(response.body);
         filmIdReviews.forEach(filmRevs => {
+          // console.log(filmRevs);
           if(filmRevs.reviews.length >=5 && (getAverageRating(filmRevs.reviews) > 4)) {
-            console.log(getAverageRating(filmRevs.reviews));
+            // console.log(filmRevs.reviews);
+            // console.log(getAverageRating(filmRevs.reviews));
             filteredArray.push({
               id: filmRevs.film_id,
               totalReviews: filmRevs.reviews.length,
@@ -119,19 +120,32 @@ function getFilmRecommendations(req, res) {
             })
           }
         })
-              console.log(filteredArray);
-              filteredArray.forEach(movie => {
-                  Film.findOne({
-                    where: [{
-                      id: movie.id,
-                    }]
-                  }).then(film => {
-                    
-                  console.log(film);
-                })
-                  
-              })
+  
+              // console.log(filteredArray);
               
+              
+              filteredArray.forEach(movie => {
+                let finalArr =[];
+                  Film.findOne({
+                    where: {id: movie.id},
+                    include: [Genre]
+                  }).then(film => {
+                  // console.log(film.id);
+                  finalArr.push({
+                    id: film.id,
+                    title: film.title,
+                    releaseDate: film.release_date,
+                    genre: film.genre.name,
+                    averageRating: movie.avgRating,
+                    reviews: movie.totalReviews
+                  })
+                  // first index of finalArr contains a string of objects finalArr[0];
+                  console.log(finalArr[0]);
+                
+                })
+            
+            })
+
               
               
               
