@@ -110,11 +110,35 @@ function getFilmRecommendations(req, res) {
         // console.log(response);
         filmIdReviews = JSON.parse(response.body);
         filmIdReviews.forEach(filmRevs => {
-          if(filmRevs.reviews.length >=5 && (getAverageRating(filmRevs.reviews) >= 4)) {
+          if(filmRevs.reviews.length >=5 && (getAverageRating(filmRevs.reviews) > 4)) {
             console.log(getAverageRating(filmRevs.reviews));
+            filteredArray.push({
+              id: filmRevs.film_id,
+              totalReviews: filmRevs.reviews.length,
+              avgRating: getAverageRating(filmRevs.reviews)
+            })
           }
         })
+              console.log(filteredArray);
+              filteredArray.forEach(movie => {
+                  Film.findOne({
+                    where: [{
+                      id: movie.id,
+                    }]
+                  }).then(film => {
+                    
+                  console.log(film);
+                })
+                  
+              })
+              
+              
+              
+              
+              
+              
       })
+
     })
     
   });
