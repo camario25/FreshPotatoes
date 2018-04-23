@@ -95,8 +95,12 @@ function getFilmRecommendations(req, res) {
 
       let idString = filmIds.join(',');
       request(`http://credentials-api.generalassemb.ly/4576f55f-c427-4cfc-a11c-5bfe914ca6c1?films=${idString}`, (err, response, body) =>{
-        console.log(body);
-           res.status(200).send(body);
+        // console.log(response);
+        filmIdReviews = JSON.parse(body);
+        let filmIdReviewsFive = filmIdReviews.filter(eachFilm => {
+          return eachFilm.reviews.length >= 5;
+        })
+        console.log(filmIdReviewsFive[0]);
       })
     })
     
