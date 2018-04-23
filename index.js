@@ -74,15 +74,20 @@ function getAverageRating(reviewArr) {
 
 // ROUTE HANDLER
 function getFilmRecommendations(req, res) {
-  let limit = 7;
+  let limit = 10;
   let offset = 0;
-  let orgId = parseInt(req.params.id);
+  let orgId = req.params.id;
+  
   
   if(req.query.limit) {
     limit = parseInt(req.query.limit);
   }
   if(req.query.offset) {
     offset = parseInt(req.query.limit);
+  }
+  
+  if (!Number.isInteger(parseInt(orgId))) {
+    res.status()
   }
 
   Film.findById(orgId).then(film => {
@@ -122,72 +127,21 @@ function getFilmRecommendations(req, res) {
               title: flm.title,
               releaseDate: flm.release_date,
               genre: flm.genre.name,
-              totalReviews: filmRevs.reviews.length,
-              avgRating: getAverageRating(filmRevs.reviews)
+              reviews: filmRevs.reviews.length,
+              averageRating: getAverageRating(filmRevs.reviews)
+                })
+            
+              }
             })
-            
-          }
-          })
-          
-          
-            
+
           }
         })
   
-
-              
-            //   filteredArray.forEach(movie => {
-            //       Film.findOne({
-            //         where: {id: movie.id},
-            //         include: [Genre]
-            //       }).then(film => {
-            //         return
-            //         movie['title'] = film.title,
-            //         movie['releaseDate'] = film.release_date,
-            //         movie['genre'] = film.genre.name
-            //       console.log(film.id);
-            //       finalArr.push({
-            //         id: film.id,
-            //         title: film.title,
-            //         releaseDate: film.release_date,
-            //         genre: film.genre.name,
-            //         averageRating: movie.avgRating,
-            //         reviews: movie.totalReviews
-            //       })
-            // 
-            //     })
-            // 
-            // })
               console.log(filteredArray);
-              
-              
-            //   filteredArray.forEach(movie => {
-            //     let finalArr =[];
-            //       Film.findOne({
-            //         where: {id: movie.id},
-            //         include: [Genre]
-            //       }).then(film => {
-            //       // console.log(film.id);
-            //       finalArr.push({
-            //         id: film.id,
-            //         title: film.title,
-            //         releaseDate: film.release_date,
-            //         genre: film.genre.name,
-            //         averageRating: movie.avgRating,
-            //         reviews: movie.totalReviews
-            //       })
-            //       // first index of finalArr contains a string of objects finalArr[0];
-            //       console.log(finalArr[0]);
-            // 
-            //     })
-            // 
-            // })
-
-              
-              
-              
-              
-              
+             res.status(200).json({
+               recommendations: filteredArray.slice(offset, offset+limit),
+               meta: {limit: limit, offset: offset}
+             })
       })
 
     })
