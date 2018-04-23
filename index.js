@@ -62,6 +62,15 @@ sequelize.sync();
 // ROUTES
 app.get('/films/:id/recommendations', getFilmRecommendations);
 
+//GET AVERAGE
+function getAverageRating(reviewArr) {
+  let sum = 0;
+  reviewArr.forEach( review => {
+    sum += review.rating;
+    return sum / reviewArr.lenght;
+  })
+}
+
 // ROUTE HANDLER
 function getFilmRecommendations(req, res) {
   let limit = 7;
@@ -94,13 +103,16 @@ function getFilmRecommendations(req, res) {
       });
 
       let idString = filmIds.join(',');
+      let filteredArray = [];
+      
       request(`http://credentials-api.generalassemb.ly/4576f55f-c427-4cfc-a11c-5bfe914ca6c1?films=${idString}`, (err, response, body) =>{
         // console.log(response);
         filmIdReviews = JSON.parse(body);
-        let filmIdReviewsFive = filmIdReviews.filter(eachFilm => {
-          return eachFilm.reviews.length >= 5;
+        filmIdReviews.forEach(filmRevs => {
+          if(filmRevs.reviews.length >= 5) {
+            console.log(filmIdReviews);
+          }
         })
-        console.log(filmIdReviewsFive[0]);
       })
     })
     
