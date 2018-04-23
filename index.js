@@ -91,14 +91,16 @@ function getFilmRecommendations(req, res) {
     let after15 = relDate.add(15, 'years').format('YYYY-MM-DD');
 
     Film.findAll({
-      where: [ {
+      where: {
         genre_id: film.genre_id,
         release_date: {
           $between: [before15, after15]
         }
-      }],
-      order: ['id']
+      },
+      include: [Genre]
+      // order: ['id']
     }).then(films => {
+      // console.log(films);
       let filmIds = films.map(film => {
         return film.id
       });
@@ -111,40 +113,75 @@ function getFilmRecommendations(req, res) {
         filmIdReviews.forEach(filmRevs => {
           // console.log(filmRevs);
           if(filmRevs.reviews.length >=5 && (getAverageRating(filmRevs.reviews) > 4)) {
+            films.forEach(flm => {
             // console.log(filmRevs.reviews);
             // console.log(getAverageRating(filmRevs.reviews));
+            if (flm.id === filmRevs.film_id){
             filteredArray.push({
               id: filmRevs.film_id,
+              title: flm.title,
+              releaseDate: flm.release_date,
+              genre: flm.genre.name,
               totalReviews: filmRevs.reviews.length,
               avgRating: getAverageRating(filmRevs.reviews)
             })
+            
+          }
+          })
+          
+          
+            
           }
         })
   
-              // console.log(filteredArray);
+
+              
+            //   filteredArray.forEach(movie => {
+            //       Film.findOne({
+            //         where: {id: movie.id},
+            //         include: [Genre]
+            //       }).then(film => {
+            //         return
+            //         movie['title'] = film.title,
+            //         movie['releaseDate'] = film.release_date,
+            //         movie['genre'] = film.genre.name
+            //       console.log(film.id);
+            //       finalArr.push({
+            //         id: film.id,
+            //         title: film.title,
+            //         releaseDate: film.release_date,
+            //         genre: film.genre.name,
+            //         averageRating: movie.avgRating,
+            //         reviews: movie.totalReviews
+            //       })
+            // 
+            //     })
+            // 
+            // })
+              console.log(filteredArray);
               
               
-              filteredArray.forEach(movie => {
-                let finalArr =[];
-                  Film.findOne({
-                    where: {id: movie.id},
-                    include: [Genre]
-                  }).then(film => {
-                  // console.log(film.id);
-                  finalArr.push({
-                    id: film.id,
-                    title: film.title,
-                    releaseDate: film.release_date,
-                    genre: film.genre.name,
-                    averageRating: movie.avgRating,
-                    reviews: movie.totalReviews
-                  })
-                  // first index of finalArr contains a string of objects finalArr[0];
-                  console.log(finalArr[0]);
-                
-                })
-            
-            })
+            //   filteredArray.forEach(movie => {
+            //     let finalArr =[];
+            //       Film.findOne({
+            //         where: {id: movie.id},
+            //         include: [Genre]
+            //       }).then(film => {
+            //       // console.log(film.id);
+            //       finalArr.push({
+            //         id: film.id,
+            //         title: film.title,
+            //         releaseDate: film.release_date,
+            //         genre: film.genre.name,
+            //         averageRating: movie.avgRating,
+            //         reviews: movie.totalReviews
+            //       })
+            //       // first index of finalArr contains a string of objects finalArr[0];
+            //       console.log(finalArr[0]);
+            // 
+            //     })
+            // 
+            // })
 
               
               
