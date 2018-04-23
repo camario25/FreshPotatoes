@@ -61,6 +61,11 @@ sequelize.sync();
 
 // ROUTES
 app.get('/films/:id/recommendations', getFilmRecommendations);
+app.get('*', function(req, res) {
+  res.status(404).json({
+    message: 'route not found'
+  })
+})
 
 //GET AVERAGE
 function getAverageRating(reviewArr) {
@@ -87,12 +92,14 @@ function getFilmRecommendations(req, res) {
   }
   
   if (!Number.isInteger(parseInt(orgId))) {
-    res.status()
+    res.status(422).json({
+      message: 'invalid entry'
+    })
   }
 
   Film.findById(orgId).then(film => {
-    let relDate = moment(film.release_date);
-    let before15 = relDate.subtract(15,'years').format('YYYY-MM-DD');
+    const relDate = moment(film.release_date);
+    const before15 = relDate.subtract(15,'years').format('YYYY-MM-DD');
     let after15 = relDate.add(15, 'years').format('YYYY-MM-DD');
 
     Film.findAll({
@@ -114,6 +121,14 @@ function getFilmRecommendations(req, res) {
       let filteredArray = [];
       
       request(`http://credentials-api.generalassemb.ly/4576f55f-c427-4cfc-a11c-5bfe914ca6c1?films=${idString}`, (err, response, body) =>{
+        if (err){
+          throw ( err => {
+            console.log(err);
+            res.status(500).json({
+              message: 'server error'
+            })
+          })
+        } else
         filmIdReviews = JSON.parse(response.body);
         filmIdReviews.forEach(filmRevs => {
           // console.log(filmRevs);
@@ -136,18 +151,20 @@ function getFilmRecommendations(req, res) {
 
           }
         })
-  
               console.log(filteredArray);
              res.status(200).json({
                recommendations: filteredArray.slice(offset, offset+limit),
                meta: {limit: limit, offset: offset}
              })
       })
-
     })
-    
-  });
-   // res.status(200).send(idString);
+  })
+  .catch ( err => {
+    console.log(err);
+    res.status(422).json({
+      message: 'missing key'
+    })
+  })
 }
 
 module.exports = app;
